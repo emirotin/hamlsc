@@ -74,7 +74,7 @@ Built-in `:coffee` filter with built-in context variables, like
 
     :coffee
       c = {x: 7}
-      y = ${c.x} + c.x
+      y = #{c.x} + c.x
       alert y
 
 should be rendered _(with context variable x = 2)_ to 
