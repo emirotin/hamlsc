@@ -10,8 +10,7 @@ Dash-blocks work with any CS code.
 
 Context vriables are accessible through the sigle globa `c` object.
 
-Example:
-~~~~~~~~
+### Example:
 
 _Renering with context variable x = 1_
 
@@ -22,8 +21,7 @@ _Renering with context variable x = 1_
 
 Equal-blocks work with any CS expression.
 
-Example:
-~~~~~~~~
+### Example:
 
 _Renering with context variable x = 1_
 
