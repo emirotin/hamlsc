@@ -38,8 +38,8 @@ class CodeNode
 
     if @type == 'FILTER' and line == ':coffee'
       line = ':javascript'
-      child_contents = @raw_child_contents(@level + 1).replace /#{/g, '__ESCAPED__SHARP'
-      child_contents = cs.compile(child_contents).replace /__ESCAPED__SHARP/g, '#{'
+      child_contents = @raw_child_contents(@level + 1).replace /#{([^}]+)}/g, '__ESCAPED_SHARP($1)'
+      child_contents = cs.compile(child_contents).replace /__ESCAPED_SHARP\(([^)]+)\)/g, '#{$1}'
       child_contents = child_contents.split('\n')
       child_contents = ((new CodeNode 'NORMAL', @level + 1, l).to_func() for l in child_contents)
       child_contents = child_contents.join @nsep

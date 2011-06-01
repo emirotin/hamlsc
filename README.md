@@ -88,20 +88,15 @@ should be rendered
 
 This also supports interpolation of the global context variables: 
 
-_currently inside strings only_
-
     :coffee
-      c = {x: 7}
-      y = "#{c.x}" + c.x
-      alert y
+      alert #{c.x}
 
-should be rendered _(with context variable x = 2)_ to (omitting sandbox wrapper function)
+should be rendered _(with context variable x = 2)_ to
 
     :javascript
-      var c, y;
-      c = {x: 7};
-      y = "2" + c.x;
-      alert(y);
+      (function() {
+        alert(2);
+      }).call(this);
 
 What doesn't work
 -----------------

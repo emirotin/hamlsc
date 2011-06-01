@@ -2,8 +2,8 @@
 %html
   %head
     :coffee
-      v = "#{c.x}"
-      alert ""
+      alert #{c.x}
+      alert "#{c.x}"
   %body
     - v = 5
     - if c.x + v == 10 and [1...10].length == 9
