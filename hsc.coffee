@@ -36,19 +36,19 @@ class CodeNode
     line = @line
     line_offset =  @sep.mult(@level - code_level)
     
-    if @type == 'NORMAL'
+    if @type == 'NORMAL' or @type == 'FILTER'
       line = '"' + line_offset + line.replace(/"/g, '\\"') + '"'
     
     if @type == 'EVAL'
       line = '"' + line_offset + '" + (' + line + ')' 
     
-    if @type == 'NORMAL' or @type == 'EVAL'
+    if @type == 'NORMAL' or @type == 'EVAL' or @type == 'FILTER'
       line_prefix = @sep.mult(code_level)
       line = line_prefix + 'res.push ' + line
     
-    if @type == 'FILTER' and line == ':coffee'
-      line = ':javascript'
-      child_contents = cs.compile child_contents             
+    #if @type == 'FILTER' and line == ':coffee'
+    #  line = ':javascript'
+    #  child_contents = cs.compile child_contents             
     
     if @type == 'CODE'
       line = @sep.mult(code_level - 1) + line
@@ -128,7 +128,7 @@ class HscProcessor
     
   compile: () ->
     bc = @build_compile()
-    #sys.puts bc
+    sys.puts bc
     cs.eval bc, bare: on
         
 hp = new HscProcessor('test.haml')
