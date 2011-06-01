@@ -6,9 +6,7 @@ String::trim = () ->
   this.replace /^\s*|\s*$/, ''
 
 String::mult = (n) ->
-  if n <= 0
-    return ''
-  return Array(n + 1).join this
+  if n <= 0 then '' else Array(n + 1).join this
 
 class HscProcessor
   constructor: (@filename) ->
@@ -66,7 +64,7 @@ class HscProcessor
         else
           line_prefix = ''
         if line.match '^='
-          line = '"' + line_offset + '" + eval(' + line.substr(1).trim() + ')'
+          line = '"' + line_offset + '" + (' + line.substr(1).trim() + ')'
         else
           line = '"' + line_offset + line.replace(/"/g, '\\"') + '"'
         line = line_prefix + 'res.push ' + line
