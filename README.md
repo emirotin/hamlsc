@@ -61,7 +61,7 @@ Equal-inlines, like
 String interpolation, like
 
     %div
-      = "A value of x is ${c.x}"
+      = "A value of x is #{c.x}"
 
 or
 
