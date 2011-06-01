@@ -38,6 +38,12 @@ _Renering with context variable x = 1_
        - if x + y == 6
          %strong OK
 
+is rendered to 
+
+     %body
+       %strong OK
+
+
 ### Equal-blocks work with any CS expression.
 
 #### Example:
@@ -48,6 +54,12 @@ _Renering with context variable x = 1_
        - y = 5
        %em
          = x + y
+
+is rendered to
+
+    %body
+      %em
+        6
 
 ### Built-in `:coffee` filter with built-in context variables, like
 
