@@ -49,6 +49,23 @@ _Renering with context variable x = 1_
        %em
          = x + y
 
+Built-in `:coffee` filter with built-in context variables, like
+
+### Example 
+  
+  :coffee
+      y = 9
+      alert y
+
+should be rendered
+
+    :javascript
+      (function() {
+        var y;
+        v = 9;
+        alert(y);
+      }).call(this);
+
 What doesn't work
 -----------------
 

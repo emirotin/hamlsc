@@ -20,20 +20,34 @@ class CodeNode
     @children.push child
     child.parent = this
     
-  to_func: (code_level = 0) ->
+  raw_child_contents: (dec_level=0) ->
+    (@sep.mult(child.level - dec_level) + child.line for child in @children)
+  
+  child_contents: (code_level) ->
+    (child.to_func(code_level) for child in @children).join '\n' + @sep
+    
+  to_func: (code_level=0) ->
+    line = @line
+
     if @type == 'COMMENT'
       return ''
     
     if @type == 'CODE'
       code_level += 1
           
-    child_contents = (child.to_func(code_level) for child in @children).join '\n' + @sep
+    if @type == 'FILTER' and line == ':coffee'
+      line = ':javascript'
+      child_contents = @raw_child_contents(@level)
+      child_contents = cs.compile(child_contents).split('\n')
+      child_contents = ((new CodeNode 'NORMAL', @level + 1, l).to_func() for l in child_contents)
+      child_contents = child_contents.join '\n' + @sep
+    else
+      child_contents = @child_contents(code_level)
 
     if @type == 'ROOT'
       res = ["({render: (c={}) ->", "res = []", child_contents, 'res.join("\\n")']
       return res.join('\n' + @sep) + '\n})'
     
-    line = @line
     line_offset =  @sep.mult(@level - code_level)
     
     if @type == 'NORMAL' or @type == 'FILTER'
@@ -45,11 +59,7 @@ class CodeNode
     if @type == 'NORMAL' or @type == 'EVAL' or @type == 'FILTER'
       line_prefix = @sep.mult(code_level)
       line = line_prefix + 'res.push ' + line
-    
-    #if @type == 'FILTER' and line == ':coffee'
-    #  line = ':javascript'
-    #  child_contents = cs.compile child_contents             
-    
+        
     if @type == 'CODE'
       line = @sep.mult(code_level - 1) + line
       
@@ -119,16 +129,14 @@ class HscProcessor
         parent_node = parent_node.parent      
       new_node = new CodeNode type, level, line
       parent_node.add_child new_node
-      current_node = new_node
-  
-  
+      current_node = new_node  
   
   build_compile: () ->
     @ast.to_func()
     
   compile: () ->
     bc = @build_compile()
-    sys.puts bc
+    #sys.puts bc
     cs.eval bc, bare: on
         
 hp = new HscProcessor('test.haml')
