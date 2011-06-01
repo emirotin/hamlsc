@@ -89,19 +89,22 @@ should be rendered
 This also supports interpolation of the global context variables: 
 
     :coffee
-      alert #{c.x}
+      c = x: 2
+      alert c.x + #{c.x}
 
 should be rendered _(with context variable x = 2)_ to
 
     :javascript
       (function() {
-        alert(2);
+        var c;
+        c = {
+          x: 1
+        };
+        alert(c.x + 2);
       }).call(this);
 
 What doesn't work
 -----------------
-
-_But planned_
 
 ### Equal-inlines, like
 
