@@ -86,6 +86,23 @@ should be rendered
         alert(y);
       }).call(this);
 
+This also supports interpolation of the global context variables: 
+
+_currently inside strings only_
+
+    :coffee
+      c = {x: 7}
+      y = "#{c.x}" + c.x
+      alert y
+
+should be rendered _(with context variable x = 2)_ to (omitting sandbox wrapper function)
+
+    :javascript
+      var c, y;
+      c = {x: 7};
+      y = "2" + c.x;
+      alert(y);
+
 What doesn't work
 -----------------
 
@@ -95,23 +112,4 @@ _But planned_
 
     %strong= x
 
-What else planned
------------------
 
-### Built-in `:coffee` filter with built-in context variables
-
-like
-
-    :coffee
-      c = {x: 7}
-      y = #{c.x} + c.x
-      alert y
-
-should be rendered _(with context variable x = 2)_ to 
-(omitting sandbox closure function)
-
-    :javascript
-      var c, y;
-      c = {x: 7};
-      y = 2 + c.x;
-      alert(y);

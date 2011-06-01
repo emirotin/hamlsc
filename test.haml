@@ -2,7 +2,8 @@
 %html
   %head
     :coffee
-      v = 9 + c.x
+      v = "#{c.x}"
+      alert ""
   %body
     - v = 5
     - if c.x + v == 10 and [1...10].length == 9
@@ -11,10 +12,10 @@
           (v + 7) * 2 = 
           = (v + 7) * 2    
       %em(class="#{c.x + 4}")
-        %strong True!
+        %strong True
         %div
-          = "#{'high' + c.x}"
-    - for i in [1...10]
+          = "#{'high ' + c.x}!"
+    - for i in [1...3]
       %b
         = i
   -# Skip me

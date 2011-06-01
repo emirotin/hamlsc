@@ -22,7 +22,7 @@ class CodeNode
     child.parent = this
     
   raw_child_contents: (dec_level=0) ->
-    (@sep.mult(child.level - dec_level) + child.line for child in @children)
+    (@sep.mult(child.level - dec_level) + child.line for child in @children).join '\n'
   
   child_contents: (code_level) ->
     (child.to_func(code_level) for child in @children).join @nsep
@@ -38,8 +38,9 @@ class CodeNode
 
     if @type == 'FILTER' and line == ':coffee'
       line = ':javascript'
-      child_contents = @raw_child_contents(@level)
-      child_contents = cs.compile(child_contents).split('\n')
+      child_contents = @raw_child_contents(@level + 1).replace /#{/g, '__ESCAPED__SHARP'
+      child_contents = cs.compile(child_contents).replace /__ESCAPED__SHARP/g, '#{'
+      child_contents = child_contents.split('\n')
       child_contents = ((new CodeNode 'NORMAL', @level + 1, l).to_func() for l in child_contents)
       child_contents = child_contents.join @nsep
     else
@@ -66,7 +67,6 @@ class HscProcessor
     file_content = fs.readFileSync @filename, 'utf-8'
     @parse file_content
     return @compile()
-      
   parse: (file_content) ->
     @offset = 0
     @lines = file_content.split '\n'  
@@ -131,9 +131,8 @@ class HscProcessor
     
   compile: () ->
     bc = @build_compile()
-    #sys.puts bc
+    sys.puts bc
     cs.eval bc, bare: on
-        
+
 hp = new HscProcessor('test.haml')
 sys.puts hp.render({x: 5})
- 
