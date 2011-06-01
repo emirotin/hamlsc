@@ -1,7 +1,26 @@
 HAML with CoffeeScript Logic
 ============================
 
-Project purpose: see the name
+Project purpose: see the name.
+
+Testing:
+
+    coffee hsc.coffee
+    
+of better
+
+    coffee hsc.coffee | haml
+
+API
+----------------------
+
+_(to be expoted)_
+
+    hsc = require('./hsc')
+    hp = HscProcessor 'test.haml'
+    hp.render(x: 1)
+    
+
 
 What works
 ----------
