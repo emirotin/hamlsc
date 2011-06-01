@@ -25,11 +25,11 @@ _(to be exported)_
 What works
 ----------
 
-Dash-blocks work with any CS code.
+### Dash-blocks work with any CS code.
 
-Context vriables are accessible through the sigle globa `c` object.
+Context vriables are accessible through the single global `c` object.
 
-### Example:
+#### Example:
 
 _Renering with context variable x = 1_
 
@@ -38,9 +38,9 @@ _Renering with context variable x = 1_
        - if x + y == 6
          %strong OK
 
-Equal-blocks work with any CS expression.
+### Equal-blocks work with any CS expression.
 
-### Example:
+#### Example:
 
 _Renering with context variable x = 1_
 
@@ -49,11 +49,11 @@ _Renering with context variable x = 1_
        %em
          = x + y
 
-Built-in `:coffee` filter with built-in context variables, like
+### Built-in `:coffee` filter with built-in context variables, like
 
-### Example 
+#### Example 
   
-  :coffee
+    :coffee
       y = 9
       alert y
 
@@ -71,11 +71,11 @@ What doesn't work
 
 _But planned_
 
-Equal-inlines, like
+### Equal-inlines, like
 
     %strong= x
 
-String interpolation, like
+### String interpolation, like
 
     %div
       = "A value of x is #{c.x}"
@@ -87,7 +87,9 @@ or
 What else planned
 -----------------
 
-Built-in `:coffee` filter with built-in context variables, like
+### Built-in `:coffee` filter with built-in context variables
+
+like
 
     :coffee
       c = {x: 7}
