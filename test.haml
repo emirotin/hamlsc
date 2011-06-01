@@ -4,13 +4,13 @@
   %body
     - v = 5
     - if c.x + v == 10 and [1...10].length == 9
-      -#
-        %strong
-          - if c.x
-            (v + 7) * 2 = 
-            = (v + 7) * 2
+      %strong
+        - if c.x
+          (v + 7) * 2 = 
+          = (v + 7) * 2
       %em 
         %strong True!
     - for i in [1...10]
       %b
         = i
+  -# Skip me

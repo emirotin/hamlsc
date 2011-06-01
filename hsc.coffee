@@ -7,6 +7,54 @@ String::trim = () ->
 
 String::mult = (n) ->
   if n <= 0 then '' else Array(n + 1).join this
+  
+String::empty = () ->
+  !!this.match /^\s*$/
+
+class CodeNode  
+  constructor: (@type, @level, @line) ->
+    @sep = '  '
+    @children = []
+    
+  add_child: (child) ->
+    @children.push child
+    child.parent = this
+    
+  to_func: (code_level = 0) ->
+    if @type == 'COMMENT'
+      return ''
+    
+    if @type == 'CODE'
+      code_level += 1
+          
+    child_contents = (child.to_func(code_level) for child in @children).join '\n' + @sep
+
+    if @type == 'ROOT'
+      res = ["({render: (c={}) ->", "res = []", child_contents, 'res.join("\\n")']
+      return res.join('\n' + @sep) + '\n})'
+    
+    line = @line
+    line_offset =  @sep.mult(@level - code_level)
+    
+    if @type == 'NORMAL'
+      line = '"' + line_offset + line.replace(/"/g, '\\"') + '"'
+    
+    if @type == 'EVAL'
+      line = '"' + line_offset + '" + (' + line + ')' 
+    
+    if @type == 'NORMAL' or @type == 'EVAL'
+      line_prefix = @sep.mult(code_level)
+      line = line_prefix + 'res.push ' + line
+    
+    if @type == 'FILTER' and line == ':coffee'
+      line = ':javascript'
+      child_contents = cs.compile child_contents             
+    
+    if @type == 'CODE'
+      line = @sep.mult(code_level - 1) + line
+      
+    
+    return line + '\n' + @sep + child_contents        
 
 class HscProcessor
   constructor: (@filename) ->
@@ -24,56 +72,60 @@ class HscProcessor
       if match
         @offset = match[0]
       i += 1
+    @build_tree()
   
-  build_compile: () ->
+  build_tree: () ->
     offset_regex = RegExp('^' + @offset + '*$')
-    res = ["({render: (c={}) ->", "res = []"]
-    i = 0
-    code_depth = 0
-    prev_level = 0
-    prev_code_level = 0
-    code_levels = []
+    @ast = root = new CodeNode 'ROOT', -1, null
+    current_node = root
+    i = -1
     for line in @lines
+      i += 1
+      
+      if line.empty()
+        continue
+      
       line_offset = line.match /^\s+/
       if line_offset
         line_offset = line_offset[0]
         if not line_offset.match offset_regex
-          sys.puts 'Line ' + i + '. Wrong offset:\n' + line
+          throw new Error 'Line ' + i + '. Wrong offset:\n' + line
           return
         level = line_offset.length / @offset.length
         line = line.substr line_offset.length
       else
         line_offset = ''
         level = 0
-      if (line.match '^-') and not (line.match '^-#')
-        if level > prev_code_level
-          code_depth += 1
-          prev_code_level = level
-          code_levels.push level
-        line = @offset.mult(code_depth - 1) + line.substr(1).trim()
-      else
-        if code_depth and level <= prev_code_level
-          code_depth -= 1
-          if code_depth < 0
-            code_depth = 0
-          code_levels.pop()          
-          prev_code_level = code_levels[code_depth-1]
-        if code_depth
-          line_prefix = @offset.mult(code_depth)
-          line_offset =  @offset.mult(level - code_depth)
-        else
-          line_prefix = ''
-        if line.match '^='
-          line = '"' + line_offset + '" + (' + line.substr(1).trim() + ')'
-        else
-          line = '"' + line_offset + line.replace(/"/g, '\\"') + '"'
-        line = line_prefix + 'res.push ' + line
-      res.push line
-      i += 1
-      prev_level = level
-    res.push 'res.join("\\n")'
-    res.join('\n' + @offset) + '\n})'  
-
+      
+      if level > current_node.level + 1
+        throw new Error 'Line ' + i + '. Wrong offset:\n' + line
+      
+      type = 'NORMAL'
+      if line.match '^-#'
+        type = 'COMMENT'
+        line = line.substr(2).trim()
+      else if line.match '^-'
+        type = 'CODE'
+        line = line.substr(1).trim()
+      else if line.match '^='
+        type = 'EVAL'
+        line = line.substr(1).trim()
+      else if line.match '^:'
+        type = 'FILTER'
+        line = line.trim()
+          
+      parent_node = current_node
+      while level < parent_node.level + 1
+        parent_node = parent_node.parent      
+      new_node = new CodeNode type, level, line
+      parent_node.add_child new_node
+      current_node = new_node
+  
+  
+  
+  build_compile: () ->
+    @ast.to_func()
+    
   compile: () ->
     bc = @build_compile()
     #sys.puts bc
