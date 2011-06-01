@@ -69,7 +69,7 @@ or
 
     #div(class="#{if c.x > 7 then 'big' else 'small'}")
 
-### Built-in `:coffee` filter with built-in context variables, like
+### Built-in `:coffee` filter
 
 #### Example 
   
@@ -105,6 +105,9 @@ _But planned_
 
 ### Equal-inlines, like
 
-    %strong= x
+    %strong= c.x
 
+which must be rendered to 
+
+    %strong 5
 
