@@ -1,0 +1,16 @@
+!!! 5
+%html
+  %head
+  %body
+    - v = 5
+    - if c.x + v == 10 and [1...10].length == 9
+      -#
+        %strong
+          - if c.x
+            v = 
+            = v + 7
+      %em 
+        %strong True!
+    - for i in [1...10]
+      %b
+        = i
