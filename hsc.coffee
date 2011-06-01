@@ -14,6 +14,7 @@ String::empty = () ->
 class CodeNode  
   constructor: (@type, @level, @line) ->
     @sep = '  '
+    @nsep = '\n' + @sep
     @children = []
     
   add_child: (child) ->
@@ -24,47 +25,41 @@ class CodeNode
     (@sep.mult(child.level - dec_level) + child.line for child in @children)
   
   child_contents: (code_level) ->
-    (child.to_func(code_level) for child in @children).join '\n' + @sep
+    (child.to_func(code_level) for child in @children).join @nsep
     
   to_func: (code_level=0) ->
-    line = @line
-
     if @type == 'COMMENT'
       return ''
     
     if @type == 'CODE'
       code_level += 1
           
+    line = @line
+
     if @type == 'FILTER' and line == ':coffee'
       line = ':javascript'
       child_contents = @raw_child_contents(@level)
       child_contents = cs.compile(child_contents).split('\n')
       child_contents = ((new CodeNode 'NORMAL', @level + 1, l).to_func() for l in child_contents)
-      child_contents = child_contents.join '\n' + @sep
+      child_contents = child_contents.join @nsep
     else
       child_contents = @child_contents(code_level)
 
     if @type == 'ROOT'
       res = ["({render: (c={}) ->", "res = []", child_contents, 'res.join("\\n")']
-      return res.join('\n' + @sep) + '\n})'
-    
-    line_offset =  @sep.mult(@level - code_level)
-    
-    if @type == 'NORMAL' or @type == 'FILTER'
-      line = '"' + line_offset + line.replace(/"/g, '\\"') + '"'
-    
-    if @type == 'EVAL'
-      line = '"' + line_offset + '" + (' + line + ')' 
+      return res.join(@nsep) + '\n})'    
     
     if @type == 'NORMAL' or @type == 'EVAL' or @type == 'FILTER'
-      line_prefix = @sep.mult(code_level)
-      line = line_prefix + 'res.push ' + line
-        
-    if @type == 'CODE'
-      line = @sep.mult(code_level - 1) + line
-      
+      line_offset =  @sep.mult(@level - code_level)
+      if @type == 'EVAL'
+        line = '"' + line_offset + '" + (' + line + ')' 
+      else
+        line = '"' + line_offset + line.replace(/"/g, '\\"') + '"'    
+      line = @sep.mult(code_level) + 'res.push ' + line        
+    else if @type == 'CODE'
+      line = @sep.mult(code_level - 1) + line      
     
-    return line + '\n' + @sep + child_contents        
+    return line + @nsep + child_contents        
 
 class HscProcessor
   constructor: (@filename) ->

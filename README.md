@@ -18,8 +18,7 @@ _(to be exported)_
 
     hsc = require('./hsc')
     hp = HscProcessor 'test.haml'
-    hp.render(x: 1)
-    
+    hp.render(x: 1)    
 
 
 What works
@@ -61,6 +60,15 @@ is rendered to
       %em
         6
 
+### String interpolation, like
+
+    %div
+      = "A value of x is #{c.x}"
+
+or
+
+    #div(class="#{if c.x > 7 then 'big' else 'small'}")
+
 ### Built-in `:coffee` filter with built-in context variables, like
 
 #### Example 
@@ -86,15 +94,6 @@ _But planned_
 ### Equal-inlines, like
 
     %strong= x
-
-### String interpolation, like
-
-    %div
-      = "A value of x is #{c.x}"
-
-or
-
-    #div(class="if c.x > 7 then 'big' else 'small'")
 
 What else planned
 -----------------
