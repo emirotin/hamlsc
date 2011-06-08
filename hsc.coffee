@@ -16,7 +16,7 @@ String::startsWith = (str) ->
 
 
 class CodeNode  
-  constructor: (@type, @level, @line, @extra={}) ->
+  constructor: (@type, @level, @line) ->
     @sep = '  '
     @nsep = '\n' + @sep
     @children = []
@@ -71,23 +71,38 @@ class HscProcessor
     file_content = fs.readFileSync @filename, 'utf-8'
     @parse file_content
     return @compile()
+  
   parse: (file_content) ->
-    @offset = 0
+    @offset = ''
+    @code_offset = ''
     @lines = file_content.split '\n'  
     i = 0
     l = @lines.length
-    while not @offset and i < l
-      match = @lines[i].match /^\s+/
-      if match
-        @offset = match[0]
+    while i < l
+      line = @lines[i]
+      if not @offset
+        match = line.match /^\s+/
+        if match
+          @offset = match[0]
+      else if not @code_offset
+        match = line.match /^\s*-[^#]/
+        if match
+          line = line.substr (match[0].length - 1)
+          match = line.match /^\s*/
+          @code_offset = match[0]
+      else
+        break
       i += 1
+    
     @build_tree()
   
   build_tree: () ->
-    offset_regex = RegExp('^' + @offset + '*$')
+    offset_regex = RegExp('^(' + @offset + ')*$')    
+    code_offset_regex = RegExp('^(' + @code_offset + ')')
+    
     @ast = root = new CodeNode 'ROOT', -1, null
     current_node = root
-    i = -1
+    i = 0
     for line in @lines
       i += 1
       
@@ -110,37 +125,32 @@ class HscProcessor
         throw new Error 'Line ' + i + '. Wrong offset:\n' + line
       
       type = 'NORMAL'
-      extra = {}
+      extra_level = 0
+      
       if line.match '^-#'
         type = 'COMMENT'
         line = ''
+      
       else if line.match '^-'
-        if not line.match '^- '
-          throw new Error 'Line ' + i + '. Code lines must start with dash followed by a single space:\n' + line   
-
         type = 'CODE'
-        line = line.substr(2)
-        
-        line_offset = line.match /^\s+/
-        if line_offset
-          line_offset = line_offset[0]
-          if not line_offset.match offset_regex
-            throw new Error 'Line ' + i + '. Wrong offset:\n' + line
-          level += line_offset.length / @offset.length
-          line = line.substr line_offset.length
+        line = line.substr(1)
+        if not line.match code_offset_regex
+          throw new Error 'Line ' + i + '. Code lines must start with consistent whitespace:\n' + line
+        line = line.substr @code_offset.length  
         
       else if line.match '^='
         type = 'EVAL'
         line = line.substr(1).trim()
+      
       else if line.match '^:'
         type = 'FILTER'
         line = line.trim()
           
       parent_node = current_node
       while level < parent_node.level + 1
-        parent_node = parent_node.parent
+        parent_node = parent_node.parent        
                    
-      new_node = new CodeNode type, level, line, extra
+      new_node = new CodeNode type, level, line
       parent_node.add_child new_node
       current_node = new_node  
   
