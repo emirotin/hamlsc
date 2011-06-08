@@ -131,7 +131,6 @@ class HscProcessor
     
   compile: () ->
     bc = @build_compile()
-    sys.puts bc
     cs.eval bc, bare: on
 
 hp = new HscProcessor('test.haml')

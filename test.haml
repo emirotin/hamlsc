@@ -14,7 +14,9 @@
       %em(class="#{c.x + 4}")
         %strong True
         %div
-          = "#{'high ' + c.x}!"
+          - c.x = 6
+          - dec = (x) -> x - 1
+          = "#{'high ' + dec c.x}!"
     - for i in [1...3]
       %b
         = i
