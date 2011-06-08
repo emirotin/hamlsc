@@ -10,9 +10,13 @@ String::mult = (n) ->
   
 String::empty = () ->
   !!this.match /^\s*$/
+  
+String::startsWith = (str) ->
+  this.indexOf(str) == 0
+
 
 class CodeNode  
-  constructor: (@type, @level, @line) ->
+  constructor: (@type, @level, @line, @extra={}) ->
     @sep = '  '
     @nsep = '\n' + @sep
     @children = []
@@ -95,7 +99,7 @@ class HscProcessor
         line_offset = line_offset[0]
         if not line_offset.match offset_regex
           throw new Error 'Line ' + i + '. Wrong offset:\n' + line
-          return
+
         level = line_offset.length / @offset.length
         line = line.substr line_offset.length
       else
@@ -106,12 +110,25 @@ class HscProcessor
         throw new Error 'Line ' + i + '. Wrong offset:\n' + line
       
       type = 'NORMAL'
+      extra = {}
       if line.match '^-#'
         type = 'COMMENT'
-        line = line.substr(2).trim()
+        line = ''
       else if line.match '^-'
+        if not line.match '^- '
+          throw new Error 'Line ' + i + '. Code lines must start with dash followed by a single space:\n' + line   
+
         type = 'CODE'
-        line = line.substr(1).trim()
+        line = line.substr(2)
+        
+        line_offset = line.match /^\s+/
+        if line_offset
+          line_offset = line_offset[0]
+          if not line_offset.match offset_regex
+            throw new Error 'Line ' + i + '. Wrong offset:\n' + line
+          level += line_offset.length / @offset.length
+          line = line.substr line_offset.length
+        
       else if line.match '^='
         type = 'EVAL'
         line = line.substr(1).trim()
@@ -121,8 +138,9 @@ class HscProcessor
           
       parent_node = current_node
       while level < parent_node.level + 1
-        parent_node = parent_node.parent      
-      new_node = new CodeNode type, level, line
+        parent_node = parent_node.parent
+                   
+      new_node = new CodeNode type, level, line, extra
       parent_node.add_child new_node
       current_node = new_node  
   
@@ -131,6 +149,7 @@ class HscProcessor
     
   compile: () ->
     bc = @build_compile()
+    sys.puts bc
     cs.eval bc, bare: on
 
 hp = new HscProcessor('test.haml')
