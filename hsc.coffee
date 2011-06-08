@@ -1,4 +1,3 @@
-sys = require 'sys'
 fs = require 'fs'
 cs = require 'coffee-script'
 
@@ -159,8 +158,6 @@ class HscProcessor
     
   compile: () ->
     bc = @build_compile()
-    sys.puts bc
     cs.eval bc, bare: on
 
-hp = new HscProcessor('test.haml')
-sys.puts hp.render({x: 5})
+exports.HscProcessor = HscProcessor

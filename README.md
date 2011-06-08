@@ -14,7 +14,7 @@ of better
 API
 ----------------------
 
-_(to be exported)_
+_see `test.coffee`_
 
     hsc = require('./hsc')
     hp = HscProcessor 'test.haml'
