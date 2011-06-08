@@ -5,11 +5,11 @@ Project purpose: see the name.
 
 Testing:
 
-    coffee hsc.coffee
+    coffee test.coffee
     
 of better
 
-    coffee hsc.coffee | haml
+    coffee test.coffee | haml
 
 API
 ----------------------
