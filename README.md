@@ -1,7 +1,7 @@
 HAML with CoffeeScript Logic
 ============================
 
-Project purpose: see the name.
+Project purpose: see the title.
 
 Testing:
 
