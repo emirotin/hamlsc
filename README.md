@@ -26,7 +26,7 @@ What works
 
 ### Dash-blocks work with any CS code.
 
-Context vriables are accessible through the single global `c` object.
+Context vriables are accessible through the single global `c` (context) object.
 
 #### Example:
 
@@ -34,7 +34,7 @@ _Renering with context variable x = 1_
 
      %body
        - y = 5
-       - if x + y == 6
+       - if c.x + y == 6
          %strong OK
 
 is rendered to 
@@ -52,7 +52,7 @@ _Renering with context variable x = 1_
      %body
        - y = 5
        %em
-         = x + y
+         = c.x + y
 
 is rendered to
 
